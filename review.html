@@ -114,6 +114,22 @@
       text-align: center;
       padding: 40px 0;
     }
+    .section-title {
+      font-size: 15px;
+      font-weight: 600;
+      margin: 40px 0 14px;
+      color: #94a3b8;
+      text-transform: uppercase;
+      letter-spacing: 0.03em;
+    }
+    .item.auto {
+      border-left-color: #22c55e;
+    }
+    .category-tag {
+      font-size: 13px;
+      font-weight: 700;
+      color: #22c55e;
+    }
   </style>
 </head>
 <body>
@@ -127,6 +143,9 @@
     <div class="stats" id="stats"></div>
     <button class="refresh" onclick="loadQueue()">Refresh</button>
     <div id="queue"></div>
+
+    <div class="section-title">Auto-Routed Tickets</div>
+    <div id="autoRouted"></div>
   </div>
 
   <script>
@@ -140,14 +159,52 @@
     }
 
     async function loadQueue() {
-      const response = await fetch("/review-queue");
-      const items = await response.json();
+      const [queueResponse, statsResponse, autoResponse] = await Promise.all([
+        fetch("/review-queue"),
+        fetch("/stats"),
+        fetch("/auto-routed"),
+      ]);
+      const items = await queueResponse.json();
+      const stats = await statsResponse.json();
+      const autoItems = await autoResponse.json();
 
-      renderStats(items);
+      renderStats(items, stats);
       renderQueue(items);
+      renderAutoRouted(autoItems);
     }
 
-    function renderStats(items) {
+    function renderAutoRouted(items) {
+      const container = document.getElementById("autoRouted");
+
+      if (items.length === 0) {
+        container.innerHTML = `<div class="empty">No auto-routed tickets yet.</div>`;
+        return;
+      }
+
+      // Most recent first
+      items = [...items].reverse();
+
+      let html = "";
+      for (const item of items) {
+        html += `
+          <div class="item auto">
+            <div class="item-top">
+              <div>
+                <div class="ticket-text">${item.ticket}</div>
+                <div class="guess"><span class="category-tag">${item.category}</span></div>
+              </div>
+              <div class="confidence-pill" style="background:#22c55e; color:#0f172a">
+                ${Math.round(item.confidence * 100)}%
+              </div>
+            </div>
+            <div class="meta">Routed ${item.routed_at}</div>
+          </div>
+        `;
+      }
+      container.innerHTML = html;
+    }
+
+    function renderStats(items, stats) {
       const avgConfidence = items.length
         ? Math.round((items.reduce((sum, i) => sum + i.confidence, 0) / items.length) * 100)
         : 0;
@@ -159,7 +216,11 @@
         </div>
         <div class="stat">
           <div class="value">${avgConfidence}%</div>
-          <div class="label">Avg. confidence</div>
+          <div class="label">Avg. confidence in queue</div>
+        </div>
+        <div class="stat">
+          <div class="value">${stats.auto_route_rate}%</div>
+          <div class="label">Auto-routing rate (${stats.total} total tickets)</div>
         </div>
       `;
     }

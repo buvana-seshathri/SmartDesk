@@ -12,6 +12,13 @@ TICKETS = [
     ("Please freeze my card, I lost my wallet and I'm worried someone will use it.", "Fraud Alert"),
     ("I got a text saying my card was used at a gas station across the country.", "Fraud Alert"),
     ("Someone changed my account email without my permission.", "Fraud Alert"),
+    ("I got an alert about a login from a device I don't recognize.", "Fraud Alert"),
+    ("There's a wire transfer out of my account that I never authorized.", "Fraud Alert"),
+    ("My debit card info was used online but I still have the card in my wallet.", "Fraud Alert"),
+    ("I keep getting login attempts on my account from a country I've never visited.", "Fraud Alert"),
+    ("Someone opened a credit line using my information without my knowledge.", "Fraud Alert"),
+    ("I received a suspicious email asking to confirm my account details.", "Fraud Alert"),
+    ("My checkbook was stolen and I'm worried someone will try to use it.", "Fraud Alert"),
 
     # Billing Dispute
     ("I was charged twice for the same monthly subscription fee.", "Billing Dispute"),
@@ -22,6 +29,13 @@ TICKETS = [
     ("I was billed for a service I cancelled two months ago.", "Billing Dispute"),
     ("The exchange rate you used for my overseas purchase seems off.", "Billing Dispute"),
     ("I want to dispute a charge from a merchant that never shipped my order.", "Billing Dispute"),
+    ("There's a payment on my account I don't remember approving.", "Billing Dispute"),
+    ("My monthly maintenance fee went up without any notice.", "Billing Dispute"),
+    ("I was double billed for the same wire transfer fee.", "Billing Dispute"),
+    ("The amount charged doesn't match the receipt I got from the store.", "Billing Dispute"),
+    ("I cancelled my card but I'm still seeing the annual fee on my bill.", "Billing Dispute"),
+    ("I was charged for overdraft protection I never signed up for.", "Billing Dispute"),
+    ("Why does my statement show a foreign transaction fee for a US purchase?", "Billing Dispute"),
 
     # Account Access
     ("I can't log into my online banking, it says my password is wrong.", "Account Access"),
@@ -32,6 +46,13 @@ TICKETS = [
     ("How do I add my spouse as an authorized user on my account?", "Account Access"),
     ("I forgot the answers to my security questions, how do I reset them?", "Account Access"),
     ("Can you unlock my account, I'm locked out and need to pay a bill today.", "Account Access"),
+    ("I want to close my account, what steps do I need to take?", "Account Access"),
+    ("How do I permanently delete my online banking profile?", "Account Access"),
+    ("I need to remove my ex-spouse as an authorized user on my account.", "Account Access"),
+    ("The app won't accept my fingerprint anymore, how do I fix that?", "Account Access"),
+    ("Can I merge two of my accounts into one login?", "Account Access"),
+    ("I want to switch from SMS codes to an authenticator app for login.", "Account Access"),
+    ("My username got reset somehow and I don't know my new one.", "Account Access"),
 
     # Loan Inquiry
     ("What's the current interest rate on a 30 year mortgage?", "Loan Inquiry"),
@@ -42,6 +63,13 @@ TICKETS = [
     ("I want to know my remaining balance on my student loan.", "Loan Inquiry"),
     ("What credit score do I need to qualify for a home equity loan?", "Loan Inquiry"),
     ("Can I increase my loan amount after it's already been approved?", "Loan Inquiry"),
+    ("What's the difference between a fixed and variable rate loan?", "Loan Inquiry"),
+    ("How do I add a co-signer to my existing loan?", "Loan Inquiry"),
+    ("Is pre-qualification the same as pre-approval for a mortgage?", "Loan Inquiry"),
+    ("What happens to my loan if I miss a payment this month?", "Loan Inquiry"),
+    ("Can I use a personal loan to consolidate my credit card debt?", "Loan Inquiry"),
+    ("How much of a down payment do I need for an auto loan?", "Loan Inquiry"),
+    ("What's the maximum loan term you offer for home renovations?", "Loan Inquiry"),
 
     # Investment Question
     ("How do I move money from my checking account into my brokerage account?", "Investment Question"),
@@ -52,6 +80,13 @@ TICKETS = [
     ("How do I set up automatic contributions to my index fund?", "Investment Question"),
     ("Can I withdraw from my 401k early without a penalty?", "Investment Question"),
     ("What happens to my stocks if the company gets acquired?", "Investment Question"),
+    ("How do I set up a recurring transfer into my investment account?", "Investment Question"),
+    ("What's the tax difference between short term and long term capital gains?", "Investment Question"),
+    ("Can I have both a 401k and an IRA at the same time?", "Investment Question"),
+    ("How is my investment account performance calculated in the app?", "Investment Question"),
+    ("What's the minimum amount needed to open a brokerage account?", "Investment Question"),
+    ("Can you explain how a target date fund adjusts risk over time?", "Investment Question"),
+    ("I want to change my beneficiary on my retirement account.", "Investment Question"),
 
     # Compliance / Regulatory
     ("I need a copy of my tax documents for last year.", "Compliance/Regulatory"),
@@ -62,6 +97,13 @@ TICKETS = [
     ("I need proof that my account complies with FDIC insurance limits.", "Compliance/Regulatory"),
     ("Why is there a hold on my transfer pending compliance review?", "Compliance/Regulatory"),
     ("Can you send me your privacy policy regarding data sharing?", "Compliance/Regulatory"),
+    ("I need to update my mailing address on file for tax reporting purposes.", "Compliance/Regulatory"),
+    ("Why is there a limit on how much cash I can deposit without extra verification?", "Compliance/Regulatory"),
+    ("I need documentation showing my account ownership for a legal matter.", "Compliance/Regulatory"),
+    ("What information do you share with credit bureaus about my account?", "Compliance/Regulatory"),
+    ("Can you explain why I need to re-verify my identity after a year?", "Compliance/Regulatory"),
+    ("I want a record of all the disclosures you're required to give me.", "Compliance/Regulatory"),
+    ("Why was my transfer flagged under the Bank Secrecy Act reporting rules?", "Compliance/Regulatory"),
 
     # Technical Issue
     ("The mobile app crashes every time I try to deposit a check.", "Technical Issue"),
@@ -72,4 +114,11 @@ TICKETS = [
     ("The fingerprint login stopped working after the last update.", "Technical Issue"),
     ("I keep getting an error page when I try to submit a payment.", "Technical Issue"),
     ("The chart showing my spending history won't load on the dashboard.", "Technical Issue"),
+    ("My app keeps freezing whenever I try to view my transaction history.", "Technical Issue"),
+    ("My face ID login stopped working after I updated my phone.", "Technical Issue"),
+    ("The notification badge on the app never clears even after I read everything.", "Technical Issue"),
+    ("I can't scroll past the first page of my transaction list.", "Technical Issue"),
+    ("The check deposit camera won't focus no matter what I try.", "Technical Issue"),
+    ("My budget categories reset to default every time I close the app.", "Technical Issue"),
+    ("The dark mode setting keeps switching back to light mode on its own.", "Technical Issue"),
 ]

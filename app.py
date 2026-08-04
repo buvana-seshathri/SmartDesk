@@ -4,6 +4,8 @@ from fastapi.responses import FileResponse
 from pydantic import BaseModel
 from router import route_ticket
 from review_queue import add_to_queue, get_queue, resolve_ticket
+from stats import record_result, get_stats
+from auto_routed import log_auto_routed, get_auto_routed
 
 app = FastAPI()
 
@@ -37,9 +39,22 @@ def admin_page():
 @app.post("/route")
 def route(request: TicketRequest):
     result = route_ticket(request.text)
+    record_result(result["needs_review"])
     if result["needs_review"]:
         add_to_queue(result["ticket"], result["confidence"], result["top_guess"])
+    else:
+        log_auto_routed(result["ticket"], result["category"], result["confidence"])
     return result
+
+
+@app.get("/stats")
+def stats():
+    return get_stats()
+
+
+@app.get("/auto-routed")
+def auto_routed():
+    return get_auto_routed()
 
 
 @app.get("/review-queue")

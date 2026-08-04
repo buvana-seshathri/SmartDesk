@@ -3,10 +3,21 @@ import chromadb
 client = chromadb.PersistentClient(path="./chroma_db")
 collection = client.get_collection("tickets")
 
-CONFIDENCE_THRESHOLD = 0.50  # below this, we don't trust the auto-routing
+CONFIDENCE_THRESHOLD = 0.48  # tuned after testing against real queries
 
 
 def route_ticket(ticket_text, top_k=3):
+    ticket_text = ticket_text.strip()
+    if not ticket_text:
+        return {
+            "ticket": ticket_text,
+            "category": None,
+            "top_guess": None,
+            "confidence": 0.0,
+            "needs_review": True,
+            "nearest": [],
+        }
+
     results = collection.query(query_texts=[ticket_text], n_results=top_k)
 
     matched_texts = results["documents"][0]

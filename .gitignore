@@ -1,6 +1,8 @@
 __pycache__/
 *.pyc
 chroma_db/
+review_queue.json
+stats.json
 .env
 venv/
-review_queue.json
+auto_routed.json
