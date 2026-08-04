@@ -3,7 +3,7 @@ import chromadb
 client = chromadb.PersistentClient(path="./chroma_db")
 collection = client.get_collection("tickets")
 
-CONFIDENCE_THRESHOLD = 0.55  # below this, we don't trust the auto-routing
+CONFIDENCE_THRESHOLD = 0.50  # below this, we don't trust the auto-routing
 
 
 def route_ticket(ticket_text, top_k=3):
@@ -28,6 +28,7 @@ def route_ticket(ticket_text, top_k=3):
     return {
         "ticket": ticket_text,
         "category": None if needs_review else top_category,
+        "top_guess": top_category,
         "confidence": round(confidence, 2),
         "needs_review": needs_review,
         "nearest": nearest,

@@ -2,88 +2,183 @@
 <html>
 <head>
   <meta charset="UTF-8">
-  <title>SmartDesk</title>
+  <title>SmartDesk - Submit a Ticket</title>
   <style>
     body {
-      font-family: sans-serif;
-      max-width: 600px;
-      margin: 60px auto;
-      color: #222;
+      font-family: 'Segoe UI', sans-serif;
+      background: #f1f5f9;
+      color: #1e293b;
+      margin: 0;
+    }
+    header {
+      background: #0f172a;
+      color: white;
+      padding: 18px 40px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+    header a {
+      color: #94a3b8;
+      text-decoration: none;
+      font-size: 14px;
+    }
+    .content {
+      max-width: 650px;
+      margin: 50px auto;
+      padding: 0 20px;
+    }
+    .card {
+      background: white;
+      border-radius: 10px;
+      padding: 30px;
+      box-shadow: 0 1px 3px rgba(0,0,0,0.08);
+      margin-bottom: 20px;
     }
     textarea {
       width: 100%;
-      height: 80px;
-      font-size: 16px;
-      padding: 10px;
+      height: 90px;
+      font-size: 15px;
+      padding: 12px;
+      border: 1px solid #cbd5e1;
+      border-radius: 6px;
       box-sizing: border-box;
+      font-family: inherit;
+      resize: vertical;
     }
     button {
-      margin-top: 10px;
-      padding: 10px 20px;
-      font-size: 16px;
+      margin-top: 12px;
+      padding: 10px 24px;
+      font-size: 15px;
+      font-weight: 600;
+      background: #4f46e5;
+      color: white;
+      border: none;
+      border-radius: 6px;
       cursor: pointer;
     }
-    #result {
-      margin-top: 30px;
+    button:hover {
+      background: #4338ca;
+    }
+    button:disabled {
+      background: #94a3b8;
+      cursor: not-allowed;
+    }
+    .ticket-id {
+      color: #94a3b8;
+      font-size: 13px;
+      margin-bottom: 6px;
+    }
+    .badge {
+      display: inline-block;
+      padding: 4px 12px;
+      border-radius: 20px;
+      font-size: 13px;
+      font-weight: 600;
+    }
+    .badge.routed {
+      background: #dcfce7;
+      color: #166534;
+    }
+    .badge.review {
+      background: #fef3c7;
+      color: #92400e;
     }
     .category {
-      font-size: 20px;
-      font-weight: bold;
-    }
-    .review {
-      color: #b45309;
+      font-size: 22px;
+      font-weight: 700;
+      margin: 10px 0 4px;
     }
     .bar-track {
-      background: #eee;
+      background: #e2e8f0;
       border-radius: 6px;
-      height: 12px;
-      margin: 10px 0;
+      height: 10px;
+      margin: 12px 0 6px;
     }
     .bar-fill {
       background: #4f46e5;
-      height: 12px;
+      height: 10px;
       border-radius: 6px;
     }
+    .confidence-label {
+      font-size: 13px;
+      color: #64748b;
+      margin-bottom: 20px;
+    }
+    .examples-title {
+      font-size: 13px;
+      font-weight: 600;
+      color: #64748b;
+      text-transform: uppercase;
+      letter-spacing: 0.03em;
+      margin-bottom: 10px;
+    }
     .example {
-      padding: 10px;
-      border-left: 3px solid #ddd;
+      padding: 10px 12px;
+      background: #f8fafc;
+      border-radius: 6px;
       margin-bottom: 8px;
       font-size: 14px;
+    }
+    .example .tag {
+      font-weight: 600;
+      color: #4f46e5;
     }
   </style>
 </head>
 <body>
 
-  <h1>SmartDesk</h1>
-  <p>Paste a support ticket and see how it gets routed.</p>
+  <header>
+    <strong>SmartDesk</strong>
+    <a href="/">&larr; Home</a>
+  </header>
 
-  <textarea id="ticketInput" placeholder="e.g. I noticed a charge I don't recognize on my statement"></textarea>
-  <br>
-  <button onclick="routeTicket()">Route Ticket</button>
+  <div class="content">
+    <div class="card">
+      <h2 style="margin-top:0">Submit a Ticket</h2>
+      <textarea id="ticketInput" placeholder="Describe your issue..."></textarea>
+      <br>
+      <button id="submitBtn" onclick="routeTicket()">Submit</button>
+    </div>
 
-  <div id="result"></div>
+    <div id="result"></div>
+  </div>
 
   <script>
+    let ticketCounter = 1000;
+
     async function routeTicket() {
       const text = document.getElementById("ticketInput").value;
       if (!text.trim()) return;
 
-      const response = await fetch("http://127.0.0.1:8000/route", {
+      const btn = document.getElementById("submitBtn");
+      btn.disabled = true;
+      btn.textContent = "Routing...";
+
+      const response = await fetch("/route", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ text: text })
       });
       const data = await response.json();
       showResult(data);
+
+      btn.disabled = false;
+      btn.textContent = "Submit";
     }
 
     function showResult(data) {
+      ticketCounter++;
       const confidencePercent = Math.round(data.confidence * 100);
 
-      let html = "";
+      let html = `<div class="card">`;
+      html += `<div class="ticket-id">Ticket #${ticketCounter}</div>`;
+
       if (data.needs_review) {
-        html += `<div class="category review">Needs human review</div>`;
+        html += `<span class="badge review">Pending Review</span>`;
+        html += `<div class="category">Awaiting agent assignment</div>`;
       } else {
+        html += `<span class="badge routed">Auto-Routed</span>`;
         html += `<div class="category">${data.category}</div>`;
       }
 
@@ -91,19 +186,20 @@
         <div class="bar-track">
           <div class="bar-fill" style="width:${confidencePercent}%"></div>
         </div>
-        <p>Confidence: ${confidencePercent}%</p>
-        <h3>Nearest past tickets</h3>
+        <div class="confidence-label">Confidence: ${confidencePercent}%</div>
+        <div class="examples-title">Similar past tickets</div>
       `;
 
       for (const match of data.nearest) {
         html += `
           <div class="example">
-            <strong>${match.category}</strong> (similarity ${match.similarity})<br>
+            <span class="tag">${match.category}</span> &middot; ${match.similarity} similarity<br>
             ${match.text}
           </div>
         `;
       }
 
+      html += `</div>`;
       document.getElementById("result").innerHTML = html;
     }
   </script>

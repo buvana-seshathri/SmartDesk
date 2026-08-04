@@ -2,64 +2,204 @@
 <html>
 <head>
   <meta charset="UTF-8">
-  <title>SmartDesk - Review Queue</title>
+  <title>SmartDesk - Admin Dashboard</title>
   <style>
     body {
-      font-family: sans-serif;
-      max-width: 600px;
-      margin: 60px auto;
-      color: #222;
+      font-family: 'Segoe UI', sans-serif;
+      background: #0f172a;
+      color: #e2e8f0;
+      margin: 0;
     }
-    .item {
-      padding: 12px;
-      border-left: 3px solid #b45309;
-      background: #fffbeb;
-      margin-bottom: 10px;
+    header {
+      background: #1e293b;
+      padding: 18px 40px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      border-bottom: 1px solid #334155;
     }
-    .meta {
-      font-size: 13px;
-      color: #666;
-      margin-top: 4px;
-    }
-    button {
-      padding: 8px 16px;
+    header a {
+      color: #94a3b8;
+      text-decoration: none;
       font-size: 14px;
+    }
+    .content {
+      max-width: 800px;
+      margin: 40px auto;
+      padding: 0 20px;
+    }
+    .stats {
+      display: flex;
+      gap: 16px;
+      margin-bottom: 30px;
+    }
+    .stat {
+      background: #1e293b;
+      border: 1px solid #334155;
+      border-radius: 10px;
+      padding: 16px 22px;
+      flex: 1;
+    }
+    .stat .value {
+      font-size: 26px;
+      font-weight: 700;
+    }
+    .stat .label {
+      font-size: 13px;
+      color: #94a3b8;
+      margin-top: 2px;
+    }
+    button.refresh {
+      padding: 8px 16px;
+      font-size: 13px;
+      background: #334155;
+      color: #e2e8f0;
+      border: 1px solid #475569;
+      border-radius: 6px;
       cursor: pointer;
       margin-bottom: 20px;
+    }
+    button.refresh:hover {
+      background: #475569;
+    }
+    .item {
+      border-radius: 10px;
+      padding: 16px 20px;
+      margin-bottom: 12px;
+      border-left: 5px solid;
+      background: #1e293b;
+    }
+    .item-top {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+    }
+    .ticket-text {
+      font-size: 15px;
+      max-width: 500px;
+    }
+    .guess {
+      font-size: 12px;
+      color: #94a3b8;
+      margin-top: 6px;
+    }
+    .confidence-pill {
+      font-size: 13px;
+      font-weight: 700;
+      padding: 3px 10px;
+      border-radius: 20px;
+      white-space: nowrap;
+    }
+    .meta {
+      font-size: 12px;
+      color: #64748b;
+      margin-top: 10px;
+    }
+    button.resolve {
+      margin-top: 12px;
+      padding: 6px 14px;
+      font-size: 13px;
+      background: transparent;
+      color: #94a3b8;
+      border: 1px solid #475569;
+      border-radius: 6px;
+      cursor: pointer;
+    }
+    button.resolve:hover {
+      background: #334155;
+      color: white;
+    }
+    .empty {
+      color: #64748b;
+      text-align: center;
+      padding: 40px 0;
     }
   </style>
 </head>
 <body>
 
-  <h1>Review Queue</h1>
-  <p>Tickets SmartDesk wasn't confident enough to auto-route.</p>
+  <header>
+    <strong>SmartDesk Admin</strong>
+    <a href="/">&larr; Home</a>
+  </header>
 
-  <button onclick="loadQueue()">Refresh</button>
-
-  <div id="queue"></div>
+  <div class="content">
+    <div class="stats" id="stats"></div>
+    <button class="refresh" onclick="loadQueue()">Refresh</button>
+    <div id="queue"></div>
+  </div>
 
   <script>
+    // Confidence colors: redder = model was more unsure, amber = closer to the threshold
+    function confidenceColor(confidence) {
+      const ratio = Math.min(confidence / 0.55, 1); // 0 = totally unsure, 1 = near threshold
+      const r = 239 - ratio * (239 - 245); // stays roughly red->amber
+      const g = 68 + ratio * (158 - 68);
+      const b = 68 + ratio * (11 - 68);
+      return `rgb(${Math.round(r)}, ${Math.round(g)}, ${Math.round(b)})`;
+    }
+
     async function loadQueue() {
-      const response = await fetch("http://127.0.0.1:8000/review-queue");
+      const response = await fetch("/review-queue");
       const items = await response.json();
 
+      renderStats(items);
+      renderQueue(items);
+    }
+
+    function renderStats(items) {
+      const avgConfidence = items.length
+        ? Math.round((items.reduce((sum, i) => sum + i.confidence, 0) / items.length) * 100)
+        : 0;
+
+      document.getElementById("stats").innerHTML = `
+        <div class="stat">
+          <div class="value">${items.length}</div>
+          <div class="label">Tickets in queue</div>
+        </div>
+        <div class="stat">
+          <div class="value">${avgConfidence}%</div>
+          <div class="label">Avg. confidence</div>
+        </div>
+      `;
+    }
+
+    function renderQueue(items) {
       const container = document.getElementById("queue");
 
       if (items.length === 0) {
-        container.innerHTML = "<p>Queue is empty. Nice.</p>";
+        container.innerHTML = `<div class="empty">Queue is empty. Nice.</div>`;
         return;
       }
 
+      // Least confident first, most in need of attention
+      items.sort((a, b) => a.confidence - b.confidence);
+
       let html = "";
       for (const item of items) {
+        const color = confidenceColor(item.confidence);
         html += `
-          <div class="item">
-            ${item.ticket}
-            <div class="meta">confidence ${Math.round(item.confidence * 100)}% &middot; flagged ${item.flagged_at}</div>
+          <div class="item" style="border-left-color:${color}">
+            <div class="item-top">
+              <div>
+                <div class="ticket-text">${item.ticket}</div>
+                <div class="guess">Model's best guess: ${item.top_guess}</div>
+              </div>
+              <div class="confidence-pill" style="background:${color}; color:#1e293b">
+                ${Math.round(item.confidence * 100)}%
+              </div>
+            </div>
+            <div class="meta">Flagged ${item.flagged_at}</div>
+            <button class="resolve" onclick="resolveTicket('${item.id}')">Mark Resolved</button>
           </div>
         `;
       }
       container.innerHTML = html;
+    }
+
+    async function resolveTicket(id) {
+      await fetch(`/review-queue/${id}`, { method: "DELETE" });
+      loadQueue();
     }
 
     loadQueue();
